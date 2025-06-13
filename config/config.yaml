@@ -1,0 +1,8 @@
+audio:
+  sample_rate: 16000
+  duration: 5
+  filename: "input.wav"
+
+
+log:
+  file_path: "data/complaint_log.csv"
