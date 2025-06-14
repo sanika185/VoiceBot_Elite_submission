@@ -9,3 +9,52 @@ Alternatively, you can pin your installation to the old version, e.g. `pip insta
 
 A detailed migration guide is available here: https://github.com/openai/openai-python/discussions/742
 ",Valid
+2025-06-14 08:06:42, पे ले पे वशे ज़े.,"उत्तर प्राप्त करने में त्रुटि हुई: 
+
+You tried to access openai.ChatCompletion, but this is no longer supported in openai>=1.0.0 - see the README at https://github.com/openai/openai-python for the API.
+
+You can run `openai migrate` to automatically upgrade your codebase to use the 1.0.0 interface. 
+
+Alternatively, you can pin your installation to the old version, e.g. `pip install openai==0.28`
+
+A detailed migration guide is available here: https://github.com/openai/openai-python/discussions/742
+",Valid
+2025-06-14 08:18:27, चहाhip practiced,"उत्तर प्राप्त करने में त्रुटि हुई: 
+
+You tried to access openai.ChatCompletion, but this is no longer supported in openai>=1.0.0 - see the README at https://github.com/openai/openai-python for the API.
+
+You can run `openai migrate` to automatically upgrade your codebase to use the 1.0.0 interface. 
+
+Alternatively, you can pin your installation to the old version, e.g. `pip install openai==0.28`
+
+A detailed migration guide is available here: https://github.com/openai/openai-python/discussions/742
+",Valid
+2025-06-14 08:20:40,,"माफ़ कीजिए, आपकी बात समझ नहीं आई। कृपया फिर से बोलें।",Fallback
+2025-06-14 08:20:49,,"अब भी नहीं समझ पाया, कृपया स्पष्ट बोलें।",Fallback
+2025-06-14 08:21:21,,कृपया थोड़ी देर बाद फिर से प्रयास करें।,Fallback
+2025-06-14 08:21:21,असमर्थ ट्रांसक्रिप्ट,सिस्टम को आपकी बात समझने में समस्या हो रही है। कृपया बाद में प्रयास करें।,Failed
+2025-06-14 08:22:54,,"माफ़ कीजिए, आपकी बात समझ नहीं आई। कृपया फिर से बोलें।",Fallback
+2025-06-14 08:23:28,,"अब भी नहीं समझ पाया, कृपया स्पष्ट बोलें।",Fallback
+2025-06-14 08:24:20,,कृपया थोड़ी देर बाद फिर से प्रयास करें।,Fallback
+2025-06-14 08:24:20,असमर्थ ट्रांसक्रिप्ट,सिस्टम को आपकी बात समझने में समस्या हो रही है। कृपया बाद में प्रयास करें।,Failed
+2025-06-14 08:30:19,,"माफ़ कीजिए, आपकी बात समझ नहीं आई। कृपया फिर से बोलें।",Fallback
+2025-06-14 08:30:54,,"अब भी नहीं समझ पाया, कृपया स्पष्ट बोलें।",Fallback
+2025-06-14 08:31:41,,कृपया थोड़ी देर बाद फिर से प्रयास करें।,Fallback
+2025-06-14 08:31:41,असमर्थ ट्रांसक्रिप्ट,सिस्टम को आपकी बात समझने में समस्या हो रही है। कृपया बाद में प्रयास करें।,Failed
+2025-06-14 08:46:48,리 ن tended  prze partnergua bowl,"उत्तर प्राप्त करने में त्रुटि हुई: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}",Valid
+2025-06-14 09:39:20,bring me here,आपकी शिकायत को रिकॉर्ड कर लिया गया है। संबंधित विभाग को सूचित किया जाएगा।,Valid
+2025-06-14 09:48:07,способ,आपकी शिकायत को रिकॉर्ड कर लिया गया है। संबंधित विभाग को सूचित किया जाएगा।,Valid
+2025-06-14 09:53:57,atoire aids,आपकी शिकायत को रिकॉर्ड कर लिया गया है। संबंधित विभाग को सूचित किया जाएगा।,Valid
+2025-06-14 10:09:55,,NA,"माफ़ कीजिए, आपकी बात समझ नहीं आई। कृपया फिर से बोलें।",Fallback
+2025-06-14 10:10:52,आगल से पानी नही आरहा आग तानी,naShik,आपकी पानी से जुड़ी शिकायत दर्ज कर ली गई है।,Valid
+2025-06-14 10:13:07,,NA,"माफ़ कीजिए, आपकी बात समझ नहीं आई। कृपया फिर से बोलें।",Fallback
+2025-06-14 10:13:48,arbeit bhakti.,Nashik,आपकी शिकायत को रिकॉर्ड कर लिया गया है। संबंधित विभाग को सूचित किया जाएगा।,Valid
+2025-06-14 10:15:04,translating,Kaagal,आपकी शिकायत को रिकॉर्ड कर लिया गया है। संबंधित विभाग को सूचित किया जाएगा।,Valid
+2025-06-14 10:19:55,і permitted верسون ا<|ml|><|hi|> does,Nashik Kuzik Kuzik,आपकी शिकायत को रिकॉर्ड कर लिया गया है। संबंधित विभाग को सूचित किया जाएगा।,Valid
+2025-06-14 10:34:36,恐らしいパーニー 250,naashik,आपकी शिकायत को रिकॉर्ड कर लिया गया है। संबंधित विभाग को सूचित किया जाएगा।,Valid
+2025-06-14 10:43:44,पानिने यारा पानि,NA,Other/Unclear,"माफ कीजिए, यह शिकायत हमारी सेवाओं में नहीं आती है। कृपया पानी, बिजली, सड़क जैसी समस्या बताएं।",Unclear
+2025-06-14 10:44:54,पानी नहीं आरा हा पानी,NA,Other/Unclear,"माफ कीजिए, यह शिकायत हमारी सेवाओं में नहीं आती है। कृपया पानी, बिजली, सड़क जैसी समस्या बताएं।",Unclear
+2025-06-14 10:46:37,पानी नहीं आ रहां।,NA,Other/Unclear,"माफ कीजिए, यह शिकायत हमारी सेवाओं में नहीं आती है। कृपया पानी, बिजली, सड़क जैसी समस्या बताएं।",Unclear
+2025-06-14 10:49:48,पानी नहीं आरहा,NA,Other/Unclear,"माफ कीजिए, यह शिकायत हमारी सेवाओं में नहीं आती है। कृपया पानी, बिजली, सड़क जैसी समस्या बताएं।",Unclear
+2025-06-14 10:50:58,अगर से भिजली नहीं आदली,NA,Other/Unclear,"माफ कीजिए, यह शिकायत हमारी सेवाओं में नहीं आती है। कृपया पानी, बिजली, सड़क जैसी समस्या बताएं।",Unclear
+2025-06-14 10:54:44,ख़्ड़ से भिजिली नहीं आरहीं,नाशिक नाशिक,Electricity,आपकी शिकायत 'Electricity' श्रेणी में दर्ज की गई है। संबंधित विभाग को सूचित किया जाएगा।,Valid
