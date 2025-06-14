@@ -5,16 +5,19 @@ import csv
 from datetime import datetime
 from gtts import gTTS
 from playsound import playsound
-import time  # for small delays if needed
+import time
+import sqlite3
+import tkinter as tk
+from tkinter import scrolledtext
 
 from modules.asr_module import record_audio
 from modules.response_gen import generate_response
-from categorize_complaint import categorize_complaint  # Import complaint categorization
+from categorize_complaint import categorize_complaint
 
 MAX_RETRIES = 3
 
 print("Whisper मॉडल लोड हो रहा है...")
-whisper_model = whisper.load_model("small")  # Already loaded once here
+whisper_model = whisper.load_model("small")
 print("Whisper मॉडल लोड हो गया ✅")
 
 def load_config():
@@ -33,7 +36,6 @@ def transcribe_audio(filename):
         return ""
 
 def is_valid_transcript(text):
-    # Check transcript length and presence of alphabetic characters
     return len(text.strip()) > 5 and any(char.isalpha() for char in text)
 
 def get_fallback_response(attempt):
@@ -79,9 +81,9 @@ def log_complaint(complaint, location, bot_reply, status, category="NA"):
             writer.writerow(["Timestamp", "Complaint", "Location", "Category", "Bot Reply", "Status"])
         writer.writerow([timestamp, complaint, location, category, bot_reply, status])
 
+# Main CLI Logic (Preserved)
 def main():
     print("शिकायत प्रणाली शुरू हो रही है...\n")
-
     config = load_config()
     print("कॉन्फ़िग लोड हो गया ✅\n")
 
@@ -99,9 +101,7 @@ def main():
         print("उपयोगकर्ता ने कहा:", user_text, "\n")
 
         if is_valid_transcript(user_text):
-            # Normalize input for better matching inside categorize_complaint if needed
             user_text_norm = user_text.lower().strip()
-
             category, fallback = categorize_complaint(user_text_norm)
 
             if category == "Other/Unclear":
@@ -132,5 +132,26 @@ def main():
         speak(final_msg)
         log_complaint("असमर्थ ट्रांसक्रिप्ट", "NA", final_msg, "Failed")
 
+# GUI Wrapper on Top
+def gui_main():
+    root = tk.Tk()
+    root.title("🎤 शिकायत दर्ज करें - Civic Voicebot")
+    root.geometry("720x480")
+
+    log_area = scrolledtext.ScrolledText(root, width=85, height=25, font=("Arial", 10))
+    log_area.pack(padx=10, pady=10)
+
+    def run_and_log():
+        log_area.insert(tk.END, "🔄 प्रक्रिया शुरू हो रही है...\n")
+        log_area.update()
+        main()
+        log_area.insert(tk.END, "✅ प्रक्रिया पूरी हो गई!\n\n")
+        log_area.see(tk.END)
+
+    record_button = tk.Button(root, text="🎤 रिकॉर्ड करके शिकायत दर्ज करें", font=("Arial", 14), command=run_and_log)
+    record_button.pack(pady=10)
+
+    root.mainloop()
+
 if __name__ == "__main__":
-    main()
+    gui_main()  # Or use main() if you prefer CLI mode
