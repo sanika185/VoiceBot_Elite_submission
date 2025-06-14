@@ -1,16 +1,29 @@
-def classify_department(text):
+import difflib
+
+# Helper function to match approximate keywords in the text
+def contains_approximate_keyword(text, keywords, cutoff=0.7):
+    words = text.lower().split()
+    for word in words:
+        matches = difflib.get_close_matches(word, keywords, cutoff=cutoff)
+        if matches:
+            return True
+    return False
+
+def categorize_query(text):
     text = text.lower()
-    if "पानी" in text or "जल" in text:
-        return "Water Department"
-    elif "कचरा" in text or "गंदगी" in text:
-        return "Sanitation Department"
-    elif "सड़क" in text or "गड्ढा" in text:
-        return "Road Maintenance"
-    elif "बिजली" in text or "लाइट" in text:
-        return "Electricity Department"
-    else:
-        return None
 
-def check_location(text):
-    return any(word in text for word in ["में", "पास", "निकट", "स्थान", "इलाका"])
+    # Define keyword sets
+    keywords = {
+        "Loan Awareness": ["loan", "p2p", "peer", "lend", "borrow", "उधार", "ऋण", "लोन", "पी2पी", "लेंड"],
+        "Investor Awareness": ["निवेश", "investment", "investor", "return", "फायदा", "रिटर्न", "कमाई"],
+        "Onboarding Help": ["register", "onboard", "signup", "kyc", "form", "रजिस्टर", "साइनअप", "प्रक्रिया", "कैसे", "शुरू"],
+        "Security Concerns": ["safe", "secure", "data", "privacy", "सुरक्षा", "डाटा", "सेफ", "सिक्योर", "भरोसा"],
+        "General P2P Info": ["p2p", "peer to peer", "पियर", "क्या है", "कैसे काम करता", "बता", "जानकारी"]
+    }
 
+    # Check for matches in order of specificity
+    for intent, kw_list in keywords.items():
+        if contains_approximate_keyword(text, kw_list):
+            return intent
+
+    return "Unclear"

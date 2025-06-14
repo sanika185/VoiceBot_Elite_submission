@@ -1,183 +1,78 @@
 import yaml
-import os
 import whisper
-import csv
-from datetime import datetime
 from gtts import gTTS
 from playsound import playsound
+import os
 import time
-import sqlite3
-import tkinter as tk
-from tkinter import scrolledtext
-from dotenv import load_dotenv  # Add dotenv import
 
 from modules.asr_module import record_audio
+from modules.nlp_pipeline import categorize_query
 from modules.response_gen import generate_response
-from categorize_complaint import categorize_complaint
-from modules.mailer import send_email
 
-MAX_RETRIES = 3
-
-# Load environment variables from .env
-load_dotenv()
-
-# Get sensitive info from environment variables
-EMAIL_USER = os.getenv("EMAIL_USER")
-EMAIL_PASS = os.getenv("EMAIL_PASS")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-print("Whisper मॉडल लोड हो रहा है...")
+# Load Whisper model
+print("📢 Whisper मॉडल लोड हो रहा है...")
 whisper_model = whisper.load_model("small")
-print("Whisper मॉडल लोड हो गया ✅")
+print("✅ Whisper मॉडल लोड हो गया\n")
 
 def load_config():
-    print("Loading config...")
-    with open("config/config.yaml", "r", encoding="utf-8") as file:
-        return yaml.safe_load(file)
+    try:
+        with open("config/config.yaml", "r", encoding="utf-8") as f:
+            return yaml.safe_load(f)
+    except Exception as e:
+        print(f"[❌] config.yaml लोड करने में त्रुटि: {e}")
+        return {}
 
 def transcribe_audio(filename):
-    print("Transcribing audio using local Whisper model...")
     try:
         result = whisper_model.transcribe(filename, language="hi", fp16=False)
-        print("DEBUG - Whisper raw result:", result)
         return result["text"].strip()
     except Exception as e:
-        print(f"[ERROR] Transcription failed: {e}")
+        print(f"[❌] ट्रांसक्रिप्शन विफल: {e}")
         return ""
 
-def is_valid_transcript(text):
-    return len(text.strip()) > 5 and any(char.isalpha() for char in text)
-
-def get_fallback_response(attempt):
-    fallback_responses = [
-        "माफ़ कीजिए, आपकी बात समझ नहीं आई। कृपया फिर से बोलें।",
-        "अब भी नहीं समझ पाया, कृपया स्पष्ट बोलें।",
-        "कृपया थोड़ी देर बाद फिर से प्रयास करें।"
-    ]
-    return fallback_responses[min(attempt, len(fallback_responses) - 1)]
-
 def speak(text):
-    print(f"[DEBUG] Bot will speak: {text}")
     try:
         tts = gTTS(text=text, lang='hi')
-        filename = "voice_output.mp3"
-        tts.save(filename)
-        playsound(filename)
-        os.remove(filename)
+        tts.save("response.mp3")
+        playsound("response.mp3")
+        os.remove("response.mp3")
     except Exception as e:
-        print(f"[ERROR] Speaking failed: {e}")
+        print(f"[❌] बोलने में त्रुटि: {e}")
 
-def is_location_present(text):
-    common_locations = ["nashik", "pune", "mumbai", "kolhapur", "delhi"]
-    return any(loc.lower() in text.lower() for loc in common_locations)
-
-def ask_for_location(config):
-    speak("कृपया स्थान बताएं जहाँ यह समस्या हो रही है।")
-    print("स्थान रिकॉर्ड किया जा रहा है...")
-    record_audio("location.wav", config)
-    print("स्थान रिकॉर्ड हो गया ✅")
-    location_text = transcribe_audio("location.wav")
-    print("स्थान:", location_text)
-    return location_text if location_text else "अज्ञात स्थान"
-
-def log_complaint(complaint, location, bot_reply, status, category="NA"):
-    log_file = "complaint_log.csv"
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    file_exists = os.path.isfile(log_file)
-
-    with open(log_file, mode='a', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        if not file_exists:
-            writer.writerow(["Timestamp", "Complaint", "Location", "Category", "Bot Reply", "Status"])
-        writer.writerow([timestamp, complaint, location, category, bot_reply, status])
-
-# Main CLI Logic
 def main():
-    print("शिकायत प्रणाली शुरू हो रही है...\n")
     config = load_config()
-    print("कॉन्फ़िग लोड हो गया ✅\n")
+    if not config:
+        return
 
-    for attempt in range(MAX_RETRIES):
-        print("रिकॉर्डिंग शुरू...\n")
-        try:
+    print("🤖 VoiceBot शुरू हो गया है। 'धन्यवाद' या 'thank you' कहकर बंद करें।\n")
+    speak("नमस्ते! मैं Peer to Peer Lending VoiceBot हूँ। आप मुझसे पैसे उधार देने या लेने से जुड़े सवाल पूछ सकते हैं।")
+
+    try:
+        while True:
+            print("\n🎙️ रिकॉर्डिंग शुरू...\n")
             record_audio("input.wav", config)
-            print("रिकॉर्डिंग सेव हो गई ✅\n")
-        except Exception as e:
-            print(f"[ERROR] रिकॉर्डिंग में समस्या: {e}")
-            speak("रिकॉर्डिंग में समस्या आ गई है। कृपया पुनः प्रयास करें।")
-            continue
 
-        user_text = transcribe_audio("input.wav")
-        print("उपयोगकर्ता ने कहा:", user_text, "\n")
+            print("📝 ट्रांसक्रिप्शन चल रहा है...\n")
+            user_text = transcribe_audio("input.wav")
 
-        if is_valid_transcript(user_text):
-            user_text_norm = user_text.lower().strip()
-            category, fallback = categorize_complaint(user_text_norm)
-
-            if category == "Other/Unclear":
-                print("बॉट:", fallback)
-                speak(fallback)
-                log_complaint(user_text, "NA", fallback, "Unclear", category)
+            if not user_text:
+                reply = "माफ़ कीजिए, कुछ सुनाई नहीं दिया। कृपया दोबारा कहें।"
+            elif "धन्यवाद" in user_text.lower() or "thank" in user_text.lower() or "stop" in user_text.lower():
+                reply = "आपका दिन शुभ हो! धन्यवाद।"
+                print("🤖 बॉट:", reply)
+                speak(reply)
                 break
-
-            if not is_location_present(user_text):
-                location = ask_for_location(config)
             else:
-                location = "उल्लेखित"
+                print("🙋‍♀️ यूज़र ने कहा:", user_text)
+                intent = categorize_query(user_text)
+                reply = generate_response(intent)
 
-            bot_reply = f"आपकी शिकायत '{category}' श्रेणी में दर्ज की गई है। संबंधित विभाग को सूचित किया जाएगा।"
-            print("बॉट:", bot_reply)
-            speak(bot_reply)
-            log_complaint(user_text, location, bot_reply, "Valid", category)
+            print("🤖 बॉट:", reply)
+            speak(reply)
+            time.sleep(0.5)
 
-            # ✅ Send email notification securely using env variables
-            subject = "नई शिकायत प्राप्त हुई"
-            body = f"""नई शिकायत दर्ज की गई है:
-शिकायत: {user_text}
-स्थान: {location}
-श्रेणी: {category}
-बॉट जवाब: {bot_reply}
-"""
-            to_email = "sanikagadade641@gmail.com"
-
-            # Use EMAIL_USER and EMAIL_PASS loaded from .env
-            send_email(to_email, subject, body, "setuvani0@gmail.com", "tffrkmibpycxvntl")  # ✅ works, but not secure
-
-
-            break
-        else:
-            fallback = get_fallback_response(attempt)
-            print("बॉट:", fallback)
-            speak(fallback)
-            log_complaint(user_text, "NA", fallback, "Fallback")
-
-    else:
-        final_msg = "सिस्टम को आपकी बात समझने में समस्या हो रही है। कृपया बाद में प्रयास करें।"
-        print("\nबॉट:", final_msg)
-        speak(final_msg)
-        log_complaint("असमर्थ ट्रांसक्रिप्ट", "NA", final_msg, "Failed")
-
-# GUI Wrapper
-def gui_main():
-    root = tk.Tk()
-    root.title("🎤 शिकायत दर्ज करें - Civic Voicebot")
-    root.geometry("720x480")
-
-    log_area = scrolledtext.ScrolledText(root, width=85, height=25, font=("Arial", 10))
-    log_area.pack(padx=10, pady=10)
-
-    def run_and_log():
-        log_area.insert(tk.END, "🔄 प्रक्रिया शुरू हो रही है...\n")
-        log_area.update()
-        main()
-        log_area.insert(tk.END, "✅ प्रक्रिया पूरी हो गई!\n\n")
-        log_area.see(tk.END)
-
-    record_button = tk.Button(root, text="🎤 रिकॉर्ड करके शिकायत दर्ज करें", font=("Arial", 14), command=run_and_log)
-    record_button.pack(pady=10)
-
-    root.mainloop()
+    except KeyboardInterrupt:
+        print("\n🛑 मैन्युअली बंद किया गया। धन्यवाद!")
 
 if __name__ == "__main__":
-    gui_main()
-
+    main()

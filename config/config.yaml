@@ -1,15 +1,29 @@
-audio:
-  sample_rate: 16000
-  duration: 5
-  filename: "input.wav"
+asr:
+  sample_rate: 16000     # Sampling rate in Hz
+  chunk: 1024            # Buffer size (if needed in future)
+  channels: 1            # Mono channel
+  duration: 5            # Default recording duration in seconds
+  device_index: null     # Use default input device
 
+tts:
+  lang: hi               # Text-to-speech language
 
-log:
-  file_path: "data/complaint_log.csv"
 email:
-  sender: "setuvani0@gmail.com"          # your Gmail address
-  receiver: "sanikagadade641@gmail.com"    # where to send complaint notifications
-  subject: "Complaint Registered"
-  smtp_server: "smtp.gmail.com"
-  smtp_port: 587
-  app_password: "tffrkmibpycxvntl"        # REMOVE SPACES
+  to_email: sanikagadade641@gmail.com  # Receiver email
+  subject_prefix: "📢 P2P Lending Query"
+
+logging:
+  log_file: complaint_log.csv
+  log_format: "[{timestamp}] - {query} -> {reply} | {status}"
+  fallback_responses:
+    - "माफ़ कीजिए, कृपया अपना प्रश्न फिर से कहें।"
+    - "मैं समझ नहीं पाया, कृपया और स्पष्ट बोलें।"
+    - "कृपया कुछ समय बाद फिर से प्रयास करें।"
+
+locations:
+  allowed:
+    - mumbai
+    - pune
+    - delhi
+    - kolhapur
+    - nashik

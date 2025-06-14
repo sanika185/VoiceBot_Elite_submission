@@ -1,5 +1,11 @@
-sounddevice
-scipy
 whisper
-PyYAML
-ffmpeg-python
+gtts
+playsound
+pyaudio
+tk
+pandas
+pyyaml
+openai
+torch
+scipy
+faster-whisper

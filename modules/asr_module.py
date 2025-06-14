@@ -1,19 +1,18 @@
 import sounddevice as sd
 from scipy.io.wavfile import write
-import numpy as np
 
 def record_audio(filename, config):
-    fs = config['audio']['sample_rate']
-    duration = config['audio']['duration']
+    duration = config["asr"]["duration"]
+    sample_rate = config["asr"]["sample_rate"]
+    channels = config["asr"]["channels"]
 
-    print("Recording...")
-    recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
-    sd.wait()
+    print(f"🎤 {duration} सेकंड के लिए रिकॉर्ड हो रहा है...")
 
-    # ✅ Normalize audio to prevent low volume issues
-    recording = np.int16(recording / np.max(np.abs(recording)) * 32767)
-
-    write(filename, fs, recording)
-    print(f"Recording saved as {filename}")
-
+    try:
+        audio = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=channels, dtype='int16')
+        sd.wait()
+        write(filename, sample_rate, audio)
+        print("✅ रिकॉर्डिंग पूरी हो गई।\n")
+    except Exception as e:
+        print(f"[❌] रिकॉर्डिंग में त्रुटि: {e}")
 

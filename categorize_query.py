@@ -9,7 +9,7 @@ def contains_approximate_keyword(text, keywords, cutoff=0.7):
             return True
     return False
 
-def categorize_complaint(text):
+def categorize_query(text):
     text = text.lower()
 
     # Keyword lists including common misspellings or phonetic variants
