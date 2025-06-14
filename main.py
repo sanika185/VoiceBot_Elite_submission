@@ -1,9 +1,12 @@
 import yaml
 import os
 import pyttsx3
+import whisper
+import csv
+from datetime import datetime
+
 from modules.asr_module import record_audio
 from modules.response_gen import generate_response
-import whisper
 
 MAX_RETRIES = 3
 
@@ -44,6 +47,17 @@ def speak(text):
     engine.say(text)
     engine.runAndWait()
 
+def log_complaint(user_text, bot_reply, status):
+    log_file = "complaint_log.csv"
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    file_exists = os.path.isfile(log_file)
+
+    with open(log_file, mode='a', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        if not file_exists:
+            writer.writerow(["Timestamp", "User Input", "Bot Reply", "Status"])
+        writer.writerow([timestamp, user_text, bot_reply, status])
+
 def main():
     print("शिकायत प्रणाली शुरू हो रही है...\n")
 
@@ -52,7 +66,7 @@ def main():
 
     for attempt in range(MAX_RETRIES):
         print("रिकॉर्डिंग शुरू...\n")
-        record_audio("input.wav")
+        record_audio("input.wav", config)
         print("रिकॉर्डिंग सेव हो गई ✅\n")
 
         user_text = transcribe_audio("input.wav")
@@ -62,15 +76,19 @@ def main():
             bot_reply = generate_response(user_text)
             print("बॉट:", bot_reply)
             speak(bot_reply)
+            log_complaint(user_text, bot_reply, "Valid")
             break
         else:
             fallback = get_fallback_response(attempt)
             print("बॉट:", fallback)
             speak(fallback)
+            log_complaint(user_text, fallback, "Fallback")
     else:
         final_msg = "सिस्टम को आपकी बात समझने में समस्या हो रही है। कृपया बाद में प्रयास करें।"
         print("\nबॉट:", final_msg)
         speak(final_msg)
+        log_complaint("असमर्थ ट्रांसक्रिप्ट", final_msg, "Failed")
 
 if __name__ == "__main__":
     main()
+
