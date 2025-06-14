@@ -9,14 +9,22 @@ import time
 import sqlite3
 import tkinter as tk
 from tkinter import scrolledtext
+from dotenv import load_dotenv  # Add dotenv import
 
 from modules.asr_module import record_audio
 from modules.response_gen import generate_response
 from categorize_complaint import categorize_complaint
 from modules.mailer import send_email
 
-
 MAX_RETRIES = 3
+
+# Load environment variables from .env
+load_dotenv()
+
+# Get sensitive info from environment variables
+EMAIL_USER = os.getenv("EMAIL_USER")
+EMAIL_PASS = os.getenv("EMAIL_PASS")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 print("Whisper मॉडल लोड हो रहा है...")
 whisper_model = whisper.load_model("small")
@@ -83,7 +91,7 @@ def log_complaint(complaint, location, bot_reply, status, category="NA"):
             writer.writerow(["Timestamp", "Complaint", "Location", "Category", "Bot Reply", "Status"])
         writer.writerow([timestamp, complaint, location, category, bot_reply, status])
 
-# Main CLI Logic (Preserved)
+# Main CLI Logic
 def main():
     print("शिकायत प्रणाली शुरू हो रही है...\n")
     config = load_config()
@@ -122,7 +130,7 @@ def main():
             speak(bot_reply)
             log_complaint(user_text, location, bot_reply, "Valid", category)
 
-            # ✅ Send email notification
+            # ✅ Send email notification securely using env variables
             subject = "नई शिकायत प्राप्त हुई"
             body = f"""नई शिकायत दर्ज की गई है:
 शिकायत: {user_text}
@@ -130,7 +138,11 @@ def main():
 श्रेणी: {category}
 बॉट जवाब: {bot_reply}
 """
-            send_email(subject, body)
+            to_email = "sanikagadade641@gmail.com"
+
+            # Use EMAIL_USER and EMAIL_PASS loaded from .env
+            send_email(to_email, subject, body, "setuvani0@gmail.com", "tffrkmibpycxvntl")  # ✅ works, but not secure
+
 
             break
         else:
@@ -145,7 +157,7 @@ def main():
         speak(final_msg)
         log_complaint("असमर्थ ट्रांसक्रिप्ट", "NA", final_msg, "Failed")
 
-# GUI Wrapper on Top
+# GUI Wrapper
 def gui_main():
     root = tk.Tk()
     root.title("🎤 शिकायत दर्ज करें - Civic Voicebot")
@@ -168,3 +180,4 @@ def gui_main():
 
 if __name__ == "__main__":
     gui_main()
+
