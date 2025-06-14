@@ -1,0 +1,15 @@
+audio:
+  sample_rate: 16000
+  duration: 5
+  filename: "input.wav"
+
+
+log:
+  file_path: "data/complaint_log.csv"
+email:
+  sender: "setuvani0@gmail.com"          # your Gmail address
+  receiver: "sanikagadade641@gmail.com"    # where to send complaint notifications
+  subject: "Complaint Registered"
+  smtp_server: "smtp.gmail.com"
+  smtp_port: 587
+  app_password: "tffrkmibpycxvntl"        # REMOVE SPACES

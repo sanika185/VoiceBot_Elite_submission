@@ -13,6 +13,8 @@ from tkinter import scrolledtext
 from modules.asr_module import record_audio
 from modules.response_gen import generate_response
 from categorize_complaint import categorize_complaint
+from modules.mailer import send_email
+
 
 MAX_RETRIES = 3
 
@@ -119,6 +121,17 @@ def main():
             print("बॉट:", bot_reply)
             speak(bot_reply)
             log_complaint(user_text, location, bot_reply, "Valid", category)
+
+            # ✅ Send email notification
+            subject = "नई शिकायत प्राप्त हुई"
+            body = f"""नई शिकायत दर्ज की गई है:
+शिकायत: {user_text}
+स्थान: {location}
+श्रेणी: {category}
+बॉट जवाब: {bot_reply}
+"""
+            send_email(subject, body)
+
             break
         else:
             fallback = get_fallback_response(attempt)
@@ -154,4 +167,4 @@ def gui_main():
     root.mainloop()
 
 if __name__ == "__main__":
-    gui_main()  # Or use main() if you prefer CLI mode
+    gui_main()
