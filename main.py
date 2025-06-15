@@ -10,6 +10,7 @@ from difflib import get_close_matches
 from modules.asr_module import record_audio
 from modules.nlp_pipeline import categorize_query
 from modules.response_gen import generate_response
+from modules.context_utils import infer_context  # <- Make sure this is correctly imported
 
 # Load Whisper model
 print("📢 Whisper मॉडल लोड हो रहा है...")
@@ -89,13 +90,14 @@ def main():
                 print("🙋‍♀️ यूज़र ने कहा:", user_text)
                 cleaned_text = clean_transcript(user_text)
 
-                # Only translate if it seems necessary (basic English detection)
                 needs_translation = not any(char.isalpha() and char.isascii() for char in cleaned_text)
                 translated_text = translate_to_english(cleaned_text) if needs_translation else cleaned_text
                 print("🌐 अनुवादित:", translated_text)
 
+                # Get intent and context
                 intent = categorize_query(translated_text)
-                reply = generate_response(intent)
+                context = infer_context(translated_text, intent)
+                reply = generate_response(intent, context)
 
             print("🤖 बॉट:", reply)
             speak(reply)

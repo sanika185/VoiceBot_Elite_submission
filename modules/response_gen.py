@@ -1,6 +1,7 @@
 import random
 
-def generate_response(intent):
+def generate_response(intent, context=None):
+
     response_templates = {
         "Loan Awareness": [
             "Peer-to-peer lending एक ऐसी प्रणाली है जहाँ व्यक्ति बिना बैंक के मध्यस्थता के एक-दूसरे को ऋण दे या ले सकते हैं।",
