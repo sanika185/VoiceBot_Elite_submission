@@ -1,4 +1,6 @@
 import pandas as pd
+import os
+
 from modules.response_gen import generate_response
 
 INPUT_PATH = "test.csv"
