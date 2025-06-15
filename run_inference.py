@@ -1,30 +1,28 @@
 import pandas as pd
-import os
-
 from modules.response_gen import generate_response
+from translation import translate_to_hindi, translate_to_english
 
-INPUT_PATH = "test.csv"
-OUTPUT_PATH = "output/responses.csv"
+INPUT_FILE = "test.csv"
+OUTPUT_FILE = "teamname_submissions.csv"
 
 def main():
     try:
-        df = pd.read_csv(INPUT_PATH)
+        # Load test questions
+        df = pd.read_csv(INPUT_FILE)
 
-        if "Questions" not in df.columns:
-            raise ValueError("Input CSV must contain a 'Questions' column.")
+        # Translate questions to Hindi
+        df["Hindi_Questions"] = df["Questions"].apply(translate_to_hindi)
 
-        responses = []
+        # Generate responses using translated Hindi questions
+        df["Responses"] = df["Hindi_Questions"].apply(generate_response)
 
-        for question in df["Questions"]:
-            question = str(question).strip()
-            response = generate_response(question)
-            responses.append(response)
+        # Prepare final output: original English + Responses
+        final_df = df[["Questions", "Responses"]]
 
-        df["Responses"] = responses
-        os.makedirs("output", exist_ok=True)
-        df.to_csv(OUTPUT_PATH, index=False, encoding='utf-8')
+        # Save to expected output file
+        final_df.to_csv(OUTPUT_FILE, index=False)
+        print(f"✅ Inference complete. Responses saved to {OUTPUT_FILE}")
 
-        print(f"✅ Inference complete. Responses saved to {OUTPUT_PATH}")
     except Exception as e:
         print(f"[ERROR] Failed to run inference: {e}")
 

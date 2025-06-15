@@ -1,11 +1,22 @@
-whisper
-gtts
-playsound
-pyaudio
-tk
+# Core functionality
+httpx==0.27.0
+python-dotenv==1.0.1
+deep-translator==1.11.4
 pandas
 pyyaml
-openai
+
+# OpenAI compatibility (for older OpenAI APIs if needed)
+openai==1.18.0
+
+# Whisper (for speech-to-text)
+faster-whisper
+pyaudio
 torch
 scipy
-faster-whisper
+
+# Text-to-speech and audio playback
+gtts
+playsound
+
+# GUI (for Tkinter-based interfaces)
+tk

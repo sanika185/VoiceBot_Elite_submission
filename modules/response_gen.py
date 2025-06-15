@@ -1,93 +1,41 @@
-import random
+import os
+import httpx
+from dotenv import load_dotenv
+from deep_translator import GoogleTranslator
 
-def generate_response(intent, context=None):
+load_dotenv()
+api_key = os.getenv("OPENROUTER_API_KEY")
 
-    response_templates = {
-        "Loan Awareness": [
-            "Peer-to-peer lending एक ऐसी प्रणाली है जहाँ व्यक्ति बिना बैंक के मध्यस्थता के एक-दूसरे को ऋण दे या ले सकते हैं।",
-            "P2P लोन का मतलब है सीधा lending और borrowing – बिना bank के बीच में आए।",
-            "आप लोन लेना चाहते हैं? हमारे प्लेटफॉर्म से आप आसान EMI और competitive ब्याज दरें पा सकते हैं।"
-        ],
-        "Investor Awareness": [
-            "हमारे प्लेटफॉर्म पर निवेश करके आप आकर्षक रिटर्न प्राप्त कर सकते हैं।",
-            "P2P निवेश पारदर्शी और सुरक्षित है – और बैंक FD से बेहतर रिटर्न भी मिल सकता है।",
-            "यह डिजिटल प्लेटफॉर्म निवेशकों के लिए multiple borrowers से जुड़ने का मौका देता है।"
-        ],
-        "Onboarding Help": [
-            "रजिस्ट्रेशन बहुत आसान है! वेबसाइट पर जाकर 'Sign Up' करें और KYC प्रक्रिया पूरी करें।",
-            "आपको सिर्फ अपना नाम, मोबाइल नंबर और डॉक्युमेंट्स देना है, बस!",
-            "Borrower या Lender चुनने के बाद, KYC तुरंत approve हो सकता है।"
-        ],
-        "Security Concerns": [
-            "आपकी जानकारी पूरी तरह से सुरक्षित है – हम end-to-end एन्क्रिप्शन का उपयोग करते हैं।",
-            "हमारा सिस्टम डेटा गोपनीयता के सभी नियमानुसार चलता है।",
-            "हम industry-grade सुरक्षा प्रोटोकॉल अपनाते हैं ताकि आप निश्चिंत रहें।"
-        ],
-        "General P2P Info": [
-            "P2P लेंडिंग एक डिजिटल सेवा है जो उधार लेने और देने वालों को सीधे जोड़ती है।",
-            "यह बैंकिंग से अलग एक नया तरीका है जहाँ borrower और lender सीधे संपर्क में रहते हैं।",
-            "कम processing time, बेहतर ब्याज दरें – यही है P2P की खास बात।"
-        ],
-        "Complaint / Help": [
-            "हमें खेद है कि आपको कोई समस्या हुई। कृपया विस्तार से बताएं, हम तुरंत सहायता करेंगे।",
-            "समस्या बताएं – हम troubleshooting में आपकी पूरी मदद करेंगे।",
-            "कृपया बताएँ कि कौन-सी सेवा में दिक्कत आ रही है – लॉगिन, KYC या transaction?"
-        ],
-        "greeting": [
-            "नमस्ते! मैं आपका वॉइस असिस्टेंट हूँ – P2P लेंडिंग में आपकी मदद करने के लिए तैयार हूँ।",
-            "स्वागत है! आप मुझसे लोन, निवेश, रजिस्ट्रेशन, या सुरक्षा से जुड़ा कुछ भी पूछ सकते हैं।",
-            "हाय! मैं आपकी सहायता के लिए हूँ – आप क्या जानना चाहते हैं?"
-        ],
-        "unknown": [
-            "माफ कीजिए, मैं आपकी बात पूरी तरह समझ नहीं पाया। कृपया थोड़ा स्पष्ट बोलें।",
-            "क्षमा करें, क्या आप दोबारा कह सकते हैं?",
-            "थोड़ा और विस्तार से बताएँ ताकि मैं आपकी सही मदद कर सकूँ।"
-        ]
-    }
+if not api_key:
+    print("[ERROR] OPENROUTER_API_KEY not found in .env")
+else:
+    print("[INFO] API key loaded successfully")
 
-    follow_ups = {
-        "Loan Awareness": [
-            "आप कितनी राशि का लोन लेना चाह रहे हैं?",
-            "लोन की अवधि कितनी होनी चाहिए?",
-            "क्या आप secured या unsecured लोन चाहते हैं?"
-        ],
-        "Investor Awareness": [
-            "आप short-term या long-term निवेश में रुचि रखते हैं?",
-            "आपका expected return कितना है?",
-            "आप monthly invest करना चाहते हैं या एक बार में?"
-        ],
-        "Onboarding Help": [
-            "क्या आपने वेबसाइट पर signup किया?",
-            "क्या आपको OTP या KYC में कोई समस्या आ रही है?",
-            "क्या आपने Borrower या Lender विकल्प चुना है?"
-        ],
-        "Security Concerns": [
-            "क्या आपको किसी डेटा breach की आशंका है?",
-            "क्या आपको suspicious activity दिखाई दी है?",
-            "क्या आप जानना चाहेंगे हम डेटा को कैसे encrypt करते हैं?"
-        ],
-        "General P2P Info": [
-            "क्या आप borrower हैं या investor?",
-            "क्या आपको working model समझना है?",
-            "क्या आप RBI regulations से जुड़े सवाल पूछना चाहते हैं?"
-        ],
-        "Complaint / Help": [
-            "क्या आप login, payment या registration से जुड़ी शिकायत बता सकते हैं?",
-            "क्या आपके पास screenshot है?",
-            "क्या ये दिक्कत बार-बार हो रही है?"
-        ],
-        "greeting": [
-            "आप किस बारे में बात करना चाहेंगे – लोन, निवेश, या अकाउंट सेटअप?",
-            "क्या आप investor हैं या borrower?",
-            "कैसे मदद कर सकता हूँ?"
-        ],
-        "unknown": [
-            "क्या आप हिंदी या इंग्लिश में दोहरा सकते हैं?",
-            "कृपया एक और बार कोशिश करें।",
-            "आपको किस विषय में जानकारी चाहिए?"
-        ]
-    }
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "HTTP-Referer": "https://yourapp.com",  # Optional: Replace with your site if needed
+    "X-Title": "VoiceBot Assistant"
+}
 
-    main = random.choice(response_templates.get(intent, response_templates["unknown"]))
-    follow = random.choice(follow_ups.get(intent, follow_ups["unknown"]))
-    return f"{main} {follow}"
+def generate_response(question):
+    try:
+        question_in_hindi = GoogleTranslator(source='en', target='hi').translate(question)
+
+        payload = {
+            "model": "openchat/openchat-3.5-1210",  # You can try other models too
+            "messages": [
+                {"role": "system", "content": "तुम एक बैंकिंग ग्राहक सहायता सहायक हो जो हिंदी में उत्तर देता है।"},
+                {"role": "user", "content": question_in_hindi}
+            ],
+            "temperature": 0.7,
+            "max_tokens": 150
+        }
+
+        response = httpx.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=30)
+        response.raise_for_status()
+
+        return response.json()["choices"][0]["message"]["content"].strip()
+
+    except Exception as e:
+        print(f"[OpenRouter Error] {e}")
+        return "क्षमा करें, इस समय उत्तर देने में असमर्थ हूँ।"
